@@ -1,0 +1,5 @@
+node_modules
+# Private keys
+keys
+# Project zip for upload to AWS
+*.zip
