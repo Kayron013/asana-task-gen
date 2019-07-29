@@ -1,5 +1,10 @@
 node_modules
-# Private keys
+
+# Private key for Asana
 keys
+
 # Project zip for upload to AWS
 *.zip
+
+# Scripts to test functions
+test
