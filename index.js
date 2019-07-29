@@ -2,22 +2,22 @@ const user_gid = '1001152530532638';
 const proj_gid = '1133011438610423'; // Weekly Edits
 const dvd_section_gid = '1133011438610435'; // CD / DVD
 const yt_section_gid = '1133011438610436';
-const { query, createTask, addTaskToSection } = require('./requests');
+const { createTask, addTaskToSection } = require('./requests');
 const moment = require('moment');
 
-const getData = () => {
-  query(`/projects/${proj_gid}/sections`, res => {
-    console.log(res);
-  });
-};
-
+/**
+ * Returns a formatted date for task naming
+ */
 const formatDate = date => moment(date).format('YY.M MMM DD');
 
+/**
+ * Returns a formated date of the following Wednesday or Sunday
+ */
 const dueDate = (date, day) => {
-  const week_inc = Number(day === 'Sunday');
+  const week_inc = Number(day === 0); // inc if Sunday
   return moment(date)
     .add(week_inc, 'weeks')
-    .isoWeekday(day)
+    .weekday(day)
     .format('YYYY-MM-DD');
 };
 
@@ -33,10 +33,7 @@ const generateTasks = async (date = moment().startOf('week')) => {
           assignee: user_gid,
           projects: [proj_gid],
           name: formatDate(date),
-          due_on:
-            type === 'dvd'
-              ? dueDate(date, 'Sunday')
-              : dueDate(date, 'Wednesday')
+          due_on: type === 'dvd' ? dueDate(date, 0) : dueDate(date, 3)
         })
       )
     );
@@ -48,14 +45,12 @@ const generateTasks = async (date = moment().startOf('week')) => {
           assignee: user_gid,
           parent: dvd_task_gid,
           name,
-          due_on:
-            name === '8am'
-              ? dueDate(date, 'Sunday')
-              : dueDate(date, 'Wednesday')
+          due_on: name === '8am' ? dueDate(date, 0) : dueDate(date, 3)
         })
       )
     );
 
+    // Add main tasks to corresponding sections
     await Promise.all([
       addTaskToSection(dvd_task_gid, dvd_section_gid),
       addTaskToSection(yt_task_gid, yt_section_gid)
@@ -67,25 +62,5 @@ const generateTasks = async (date = moment().startOf('week')) => {
   }
 };
 
-const main = () => generateTasks();
-
-// TODO: Populate project with tasks from old project version
-// const fill = () => {};
-
 // Handler for AWS Lambda
-exports.handler = main;
-
-main();
-
-// getData();
-// const date = moment().startOf('week');
-// console.time('t');
-// createTask({
-//   assignee: user_gid,
-//   projects: [proj_gid],
-//   name: formatDate(date),
-//   due_at: moment().valueOf()
-// }).then(r => {
-//   console.log(r);
-//   console.timeEnd('t');
-// });
+exports.handler = generateTasks;
