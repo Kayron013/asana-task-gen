@@ -11,7 +11,7 @@ const moment = require('moment');
 const formatDate = date => moment(date).format('YY.M MMM DD');
 
 /**
- * Returns a formated date of the following Wednesday or Sunday
+ * Returns a formatted date of the following Wednesday or Sunday
  */
 const dueDate = (date, day) => {
   const week_inc = Number(day === 0); // inc if Sunday
