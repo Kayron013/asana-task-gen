@@ -11,7 +11,7 @@
   "author": "Angel Campbell",
   "license": "ISC",
   "dependencies": {
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "node-fetch": "^2.6.0"
   }
 }
